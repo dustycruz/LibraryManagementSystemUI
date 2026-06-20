@@ -1,122 +1,125 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from './assets/vite.svg'
-import heroImg from './assets/hero.png'
-import './App.css'
+import { BrowserRouter, Routes, Route, Navigate, useLocation } from 'react-router-dom';
+import { ToastContainer } from 'react-toastify';
+import { AuthProvider } from './context/AuthProvider';
+import { useAuth } from './context/useAuth';
+import ProtectedRoute from './components/common/ProtectedRoute';
+import Sidebar from './components/layout/Sidebar';
+import Login from './pages/Login';
+import Dashboard from './pages/Dashboard';
+import Books from './pages/Books';
+import AddBook from './pages/AddBook';
+import EditBook from './pages/EditBook';
+import BorrowHistory from './pages/BorrowHistory';
+import ManageBorrows from './pages/ManageBorrows';
+import Reports from './pages/Reports';
+import OverdueBooks from './pages/OverdueBooks';
+import Users from './pages/Users';
 
-function App() {
-  const [count, setCount] = useState(0)
+const pageAnimationStyle = `
+  @keyframes pageFadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+  .page-animate {
+    animation: pageFadeIn 0.25s ease both;
+  }
+`;
 
+function AnimatedPage({ children }) {
+  const { pathname } = useLocation();
   return (
-    <>
-      <section id="center">
-        <div className="hero">
-          <img src={heroImg} className="base" width="170" height="179" alt="" />
-          <img src={reactLogo} className="framework" alt="React logo" />
-          <img src={viteLogo} className="vite" alt="Vite logo" />
-        </div>
-        <div>
-          <h1>Get started</h1>
-          <p>
-            Edit <code>src/App.jsx</code> and save to test <code>HMR</code>
-          </p>
-        </div>
-        <button
-          type="button"
-          className="counter"
-          onClick={() => setCount((count) => count + 1)}
-        >
-          Count is {count}
-        </button>
-      </section>
-
-      <div className="ticks"></div>
-
-      <section id="next-steps">
-        <div id="docs">
-          <svg className="icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#documentation-icon"></use>
-          </svg>
-          <h2>Documentation</h2>
-          <p>Your questions, answered</p>
-          <ul>
-            <li>
-              <a href="https://vite.dev/" target="_blank">
-                <img className="logo" src={viteLogo} alt="" />
-                Explore Vite
-              </a>
-            </li>
-            <li>
-              <a href="https://react.dev/" target="_blank">
-                <img className="button-icon" src={reactLogo} alt="" />
-                Learn more
-              </a>
-            </li>
-          </ul>
-        </div>
-        <div id="social">
-          <svg className="icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#social-icon"></use>
-          </svg>
-          <h2>Connect with us</h2>
-          <p>Join the Vite community</p>
-          <ul>
-            <li>
-              <a href="https://github.com/vitejs/vite" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#github-icon"></use>
-                </svg>
-                GitHub
-              </a>
-            </li>
-            <li>
-              <a href="https://chat.vite.dev/" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#discord-icon"></use>
-                </svg>
-                Discord
-              </a>
-            </li>
-            <li>
-              <a href="https://x.com/vite_js" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#x-icon"></use>
-                </svg>
-                X.com
-              </a>
-            </li>
-            <li>
-              <a href="https://bsky.app/profile/vite.dev" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#bluesky-icon"></use>
-                </svg>
-                Bluesky
-              </a>
-            </li>
-          </ul>
-        </div>
-      </section>
-
-      <div className="ticks"></div>
-      <section id="spacer"></section>
-    </>
-  )
+    <div className="page-animate" key={pathname}>
+      {children}
+    </div>
+  );
 }
 
-export default App
+function AppLayout({ children }) {
+  return (
+    <div>
+      <Sidebar />
+      <div className="main-content">
+        <AnimatedPage>{children}</AnimatedPage>
+      </div>
+    </div>
+  );
+}
+
+function AppRoutes() {
+  const { user } = useAuth();
+
+  return (
+    <Routes>
+      <Route path="/login" element={!user ? <Login /> : <Navigate to="/dashboard" />} />
+      <Route path="/" element={<Navigate to="/dashboard" />} />
+
+      <Route path="/dashboard" element={
+        <ProtectedRoute>
+          <AppLayout><Dashboard /></AppLayout>
+        </ProtectedRoute>
+      } />
+
+      <Route path="/books" element={
+        <ProtectedRoute>
+          <AppLayout><Books /></AppLayout>
+        </ProtectedRoute>
+      } />
+
+      <Route path="/books/add" element={
+        <ProtectedRoute roles={['Admin', 'Librarian']}>
+          <AppLayout><AddBook /></AppLayout>
+        </ProtectedRoute>
+      } />
+
+      <Route path="/books/edit/:id" element={
+        <ProtectedRoute roles={['Admin', 'Librarian']}>
+          <AppLayout><EditBook /></AppLayout>
+        </ProtectedRoute>
+      } />
+
+      <Route path="/my-history" element={
+        <ProtectedRoute>
+          <AppLayout><BorrowHistory /></AppLayout>
+        </ProtectedRoute>
+      } />
+
+      <Route path="/borrows" element={
+        <ProtectedRoute roles={['Admin', 'Librarian']}>
+          <AppLayout><ManageBorrows /></AppLayout>
+        </ProtectedRoute>
+      } />
+
+      <Route path="/reports" element={
+        <ProtectedRoute roles={['Admin', 'Librarian']}>
+          <AppLayout><Reports /></AppLayout>
+        </ProtectedRoute>
+      } />
+
+      <Route path="/overdue-books" element={
+        <ProtectedRoute roles={['Admin', 'Librarian']}>
+          <AppLayout><OverdueBooks /></AppLayout>
+        </ProtectedRoute>
+      } />
+
+      <Route path="/users" element={
+        <ProtectedRoute roles={['Admin']}>
+          <AppLayout><Users /></AppLayout>
+        </ProtectedRoute>
+      } />
+
+      <Route path="*" element={<Navigate to="/dashboard" />} />
+    </Routes>
+  );
+}
+
+export default function App() {
+  return (
+    <AuthProvider>
+      <BrowserRouter>
+        <style>{pageAnimationStyle}</style>
+        <AppRoutes />
+        <ToastContainer position="top-right" autoClose={3000} />
+      </BrowserRouter>
+    </AuthProvider>
+  );
+}

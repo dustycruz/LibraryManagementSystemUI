@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 const axiosInstance = axios.create({
-  baseURL: 'http://localhost:5176/api',  // http not https, port 5176
+  baseURL: 'http://localhost:5298/api',  // http not https, port 5176
   headers: { 'Content-Type': 'application/json' },
 });
 

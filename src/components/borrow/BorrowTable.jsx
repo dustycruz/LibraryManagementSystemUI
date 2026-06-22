@@ -95,11 +95,7 @@ export default function BorrowTable({ borrows, onReturn, loading }) {
                   {b.status !== 'Returned' ? (
                     <button
                       className="lms-btn success sm"
-                      onClick={() => {
-                        if (window.confirm(`Mark as return "${b.bookTitle}"?`)) {
-                          onReturn(b.borrowId);
-                        }
-                      }}
+                      onClick={() => onReturn(b.borrowId)} // Native window.confirm removed here so it fires your custom toast layout directly
                     >
                       Mark as Return
                     </button>

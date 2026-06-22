@@ -134,15 +134,38 @@ export default function Users() {
     return () => { cancelled = true; };
   }, [refreshKey]);
 
-  const handleDeactivate = async (id) => {
-    if (!window.confirm('Deactivate this user?')) return;
-    try {
-      await deactivateUser(id);
-      toast.success('User deactivated.');
-      setRefreshKey(k => k + 1);
-    } catch {
-      toast.error('Failed to deactivate user.');
-    }
+  const handleDeactivate = (id) => {
+    const toastId = toast.info(
+      <div style={{ fontSize: '14px', fontFamily: 'inherit' }}>
+        <p style={{ margin: '0 0 10px 0', fontWeight: '500' }}>
+          Deactivate this user?
+        </p>
+        <div style={{ display: 'flex', gap: '8px', justifyContent: 'flex-end' }}>
+          <button
+            onClick={async () => {
+              toast.dismiss(toastId);
+              try {
+                await deactivateUser(id);
+                toast.success('User deactivated.');
+                setRefreshKey(k => k + 1);
+              } catch {
+                toast.error('Failed to deactivate user.');
+              }
+            }}
+            style={{ padding: '4px 10px', backgroundColor: '#003f7f', color: '#fff', border: 'none', borderRadius: '4px', cursor: 'pointer', fontWeight: '600', fontSize: '12px' }}
+          >
+            Confirm
+          </button>
+          <button
+            onClick={() => toast.dismiss(toastId)}
+            style={{ padding: '4px 10px', backgroundColor: '#e0e4ea', color: '#374151', border: 'none', borderRadius: '4px', cursor: 'pointer', fontWeight: '600', fontSize: '12px' }}
+          >
+            Cancel
+          </button>
+        </div>
+      </div>,
+      { autoClose: false, closeOnClick: false, draggable: false }
+    );
   };
 
   const openEdit = (user) => {
@@ -225,15 +248,15 @@ export default function Users() {
       }}>
         <div style={{ display: 'flex', gap: '12px', flexWrap: 'wrap', alignItems: 'center' }}>
           <div style={{ flex: 1, minWidth: '240px', position: 'relative' }}>
-<input
-  type="text"
-  value={search}
-  onChange={e => handleSearch(e.target.value)}
-  placeholder="Search by name or email..."
-  style={{ ...inputStyle, width: '100%', boxSizing: 'border-box' }}
-  onFocus={e => (e.target.style.borderColor = '#003f7f')}
-  onBlur={e => (e.target.style.borderColor = '#e0e4ea')}
-/>
+            <input
+              type="text"
+              value={search}
+              onChange={e => handleSearch(e.target.value)}
+              placeholder="Search by name or email..."
+              style={{ ...inputStyle, width: '100%', boxSizing: 'border-box' }}
+              onFocus={e => (e.target.style.borderColor = '#003f7f')}
+              onBlur={e => (e.target.style.borderColor = '#e0e4ea')}
+            />
           </div>
           <select value={roleFilter} onChange={e => handleRoleFilter(e.target.value)} style={{ ...selectStyle, minWidth: '150px' }}
             onFocus={e => (e.target.style.borderColor = '#003f7f')}

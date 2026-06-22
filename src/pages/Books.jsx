@@ -77,7 +77,6 @@ function Pagination({ currentPage, totalPages, onPageChange }) {
       </span>
 
       <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
-        {/* Previous */}
         <button
           onClick={() => onPageChange(currentPage - 1)}
           disabled={currentPage === 1}
@@ -89,7 +88,6 @@ function Pagination({ currentPage, totalPages, onPageChange }) {
           ‹
         </button>
 
-        {/* Page numbers */}
         {getPages().map((page, idx) =>
           page === '...'
             ? (
@@ -112,7 +110,6 @@ function Pagination({ currentPage, totalPages, onPageChange }) {
             )
         )}
 
-        {/* Next */}
         <button
           onClick={() => onPageChange(currentPage + 1)}
           disabled={currentPage === totalPages}
@@ -174,26 +171,68 @@ export default function Books() {
 
   const refresh = () => setRefreshKey(k => k + 1);
 
-  const handleDelete = async (id) => {
-    if (!window.confirm('Delete this book?')) return;
-    try {
-      await deleteBook(id);
-      toast.success('Book deleted.');
-      refresh();
-    } catch (err) {
-      toast.error(err.response?.data?.message || 'Delete failed.');
-    }
+  const handleDelete = (id) => {
+    const toastId = toast.info(
+      <div style={{ fontSize: '14px', fontFamily: 'inherit' }}>
+        <p style={{ margin: '0 0 10px 0', fontWeight: '500' }}>Delete this book from the collection?</p>
+        <div style={{ display: 'flex', gap: '8px', justifyContent: 'flex-end' }}>
+          <button
+            onClick={async () => {
+              toast.dismiss(toastId);
+              try {
+                await deleteBook(id);
+                toast.success('Book deleted.');
+                refresh();
+              } catch (err) {
+                toast.error(err.response?.data?.message || 'Delete failed.');
+              }
+            }}
+            style={{ padding: '4px 10px', backgroundColor: '#d32f2f', color: '#fff', border: 'none', borderRadius: '4px', cursor: 'pointer', fontWeight: '600', fontSize: '12px' }}
+          >
+            Confirm
+          </button>
+          <button
+            onClick={() => toast.dismiss(toastId)}
+            style={{ padding: '4px 10px', backgroundColor: '#e0e4ea', color: '#374151', border: 'none', borderRadius: '4px', cursor: 'pointer', fontWeight: '600', fontSize: '12px' }}
+          >
+            Cancel
+          </button>
+        </div>
+      </div>,
+      { autoClose: false, closeOnClick: false, draggable: false }
+    );
   };
 
-  const handleBorrow = async (book) => {
-    if (!window.confirm(`Borrow "${book.title}"?`)) return;
-    try {
-      await borrowBook({ bookId: book.bookId });
-      toast.success(`"${book.title}" borrowed! Due in 14 days.`);
-      refresh();
-    } catch (err) {
-      toast.error(err.response?.data?.message || 'Borrow failed.');
-    }
+  const handleBorrow = (book) => {
+    const toastId = toast.info(
+      <div style={{ fontSize: '14px', fontFamily: 'inherit' }}>
+        <p style={{ margin: '0 0 10px 0', fontWeight: '500' }}>Borrow <strong>"{book.title}"</strong>?</p>
+        <div style={{ display: 'flex', gap: '8px', justifyContent: 'flex-end' }}>
+          <button
+            onClick={async () => {
+              toast.dismiss(toastId);
+              try {
+                await borrowBook({ bookId: book.bookId });
+                toast.success(`"${book.title}" borrowed! Due in 14 days.`);
+                refresh();
+              } catch (err) {
+                toast.error(err.response?.data?.message || 'Borrow failed.');
+              }
+            }}
+            style={{ padding: '4px 10px', backgroundColor: '#003f7f', color: '#fff', border: 'none', borderRadius: '4px', cursor: 'pointer', fontWeight: '600', fontSize: '12px' }}
+          >
+            Confirm
+          </button>
+          <button
+            onClick={() => toast.dismiss(toastId)}
+            style={{ padding: '4px 10px', backgroundColor: '#e0e4ea', color: '#374151', border: 'none', borderRadius: '4px', cursor: 'pointer', fontWeight: '600', fontSize: '12px' }}
+          >
+            Cancel
+          </button>
+        </div>
+      </div>,
+      { autoClose: false, closeOnClick: false, draggable: false }
+    );
   };
 
   return (

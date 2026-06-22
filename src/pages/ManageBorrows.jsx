@@ -105,20 +105,43 @@ export default function ManageBorrows() {
     return () => { cancelled = true; };
   }, [page, statusFilter, refreshKey]);
 
-  const handleReturn = async (borrowId) => {
-    if (!window.confirm('Mark this book as returned?')) return;
-    try {
-      const res = await returnBook(borrowId);
-      const borrow = res.data.data;
-      if (borrow.fineAmount) {
-        toast.warning(`Book returned. Fine: ₱${borrow.fineAmount.toFixed(2)} (${borrow.daysOverdue} days overdue)`);
-      } else {
-        toast.success('Book returned successfully!');
-      }
-      setRefreshKey(k => k + 1);
-    } catch (err) {
-      toast.error(err.response?.data?.message || 'Return failed.');
-    }
+  const handleReturn = (borrowId) => {
+    const toastId = toast.info(
+      <div style={{ fontSize: '14px', fontFamily: 'inherit' }}>
+        <p style={{ margin: '0 0 10px 0', fontWeight: '500' }}>
+          Mark this book as returned?
+        </p>
+        <div style={{ display: 'flex', gap: '8px', justifyContent: 'flex-end' }}>
+          <button
+            onClick={async () => {
+              toast.dismiss(toastId);
+              try {
+                const res = await returnBook(borrowId);
+                const borrow = res.data.data;
+                if (borrow.fineAmount) {
+                  toast.warning(`Book returned. Fine: ₱${borrow.fineAmount.toFixed(2)} (${borrow.daysOverdue} days overdue)`);
+                } else {
+                  toast.success('Book returned successfully!');
+                }
+                setRefreshKey(k => k + 1);
+              } catch (err) {
+                toast.error(err.response?.data?.message || 'Return failed.');
+              }
+            }}
+            style={{ padding: '4px 10px', backgroundColor: '#003f7f', color: '#fff', border: 'none', borderRadius: '4px', cursor: 'pointer', fontWeight: '600', fontSize: '12px' }}
+          >
+            Confirm
+          </button>
+          <button
+            onClick={() => toast.dismiss(toastId)}
+            style={{ padding: '4px 10px', backgroundColor: '#e0e4ea', color: '#374151', border: 'none', borderRadius: '4px', cursor: 'pointer', fontWeight: '600', fontSize: '12px' }}
+          >
+            Cancel
+          </button>
+        </div>
+      </div>,
+      { autoClose: false, closeOnClick: false, draggable: false }
+    );
   };
 
   return (

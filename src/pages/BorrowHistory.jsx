@@ -15,20 +15,69 @@ export default function BorrowHistory() {
       .finally(() => setLoading(false));
   }, [refreshKey]);
 
-  const handleReturn = async (borrowId) => {
-    if (!window.confirm('Mark this book as returned?')) return;
-    try {
-      const res = await returnBook(borrowId);
-      const borrow = res.data.data;
-      if (borrow.fineAmount > 0) {
-        toast.warning(`Book returned. Fine: ₱${borrow.fineAmount.toFixed(2)} (${borrow.daysOverdue} days overdue)`);
-      } else {
-        toast.success('Book returned successfully!');
+  const handleReturn = (borrowId) => {
+    const toastId = toast(
+      ({ closeToast }) => (
+        <div style={{ fontFamily: 'inherit', padding: '2px' }}>
+          <p style={{ margin: '0 0 12px 0', fontWeight: '600', color: '#1f2937', fontSize: '14px' }}>
+            Mark this book as returned?
+          </p>
+          <div style={{ display: 'flex', gap: '8px', justifyContent: 'flex-end' }}>
+            <button
+              onClick={async () => {
+                toast.dismiss(toastId);
+                try {
+                  const res = await returnBook(borrowId);
+                  const borrow = res.data.data;
+                  if (borrow.fineAmount > 0) {
+                    toast.warning(`Book returned. Fine: ₱${borrow.fineAmount.toFixed(2)} (${borrow.daysOverdue} days overdue)`);
+                  } else {
+                    toast.success('Book returned successfully!');
+                  }
+                  setRefreshKey(k => k + 1);
+                } catch (err) {
+                  toast.error(err.response?.data?.message || 'Return failed.');
+                }
+              }}
+              style={{ 
+                padding: '6px 12px', 
+                backgroundColor: '#003f7f', 
+                color: '#fff', 
+                border: 'none', 
+                borderRadius: '6px', 
+                cursor: 'pointer', 
+                fontWeight: '600', 
+                fontSize: '12px',
+                boxShadow: '0 2px 4px rgba(0,63,127,0.2)'
+              }}
+            >
+              Confirm
+            </button>
+            <button
+              onClick={() => toast.dismiss(toastId)}
+              style={{ 
+                padding: '6px 12px', 
+                backgroundColor: '#e0e4ea', 
+                color: '#374151', 
+                border: 'none', 
+                borderRadius: '6px', 
+                cursor: 'pointer', 
+                fontWeight: '600', 
+                fontSize: '12px' 
+              }}
+            >
+              Cancel
+            </button>
+          </div>
+        </div>
+      ),
+      { 
+        autoClose: false, 
+        closeOnClick: false, 
+        draggable: false,
+        closeButton: false // Hides the classic 'X' on the top-right corner to focus on Confirm/Cancel buttons
       }
-      setRefreshKey(k => k + 1);
-    } catch (err) {
-      toast.error(err.response?.data?.message || 'Return failed.');
-    }
+    );
   };
 
   return (

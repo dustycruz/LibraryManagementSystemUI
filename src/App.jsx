@@ -15,6 +15,10 @@ import Reports from './pages/Reports';
 import OverdueBooks from './pages/OverdueBooks';
 import Users from './pages/Users';
 
+// --- NEW IMPORTS: Cart and Favorites ---
+import BookCart from './pages/BookCart';
+import Favorites from './pages/Favorites';
+
 const pageAnimationStyle = `
   @keyframes pageFadeIn {
     from { opacity: 0; transform: translateY(10px); }
@@ -62,6 +66,19 @@ function AppRoutes() {
       <Route path="/books" element={
         <ProtectedRoute>
           <AppLayout><Books /></AppLayout>
+        </ProtectedRoute>
+      } />
+
+      {/* --- NEW ROUTES: Registered under ProtectedRoute for active users --- */}
+      <Route path="/cart" element={
+        <ProtectedRoute>
+          <AppLayout><BookCart /></AppLayout>
+        </ProtectedRoute>
+      } />
+
+      <Route path="/favorites" element={
+        <ProtectedRoute>
+          <AppLayout><Favorites /></AppLayout>
         </ProtectedRoute>
       } />
 

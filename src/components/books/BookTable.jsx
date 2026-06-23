@@ -1,8 +1,9 @@
 import { Link } from 'react-router-dom';
+import { Heart } from 'lucide-react';
 import { useAuth } from '../../context/useAuth';
 
 function BookTable({ books, loading, onDelete, onBorrow }) {
-  const { isAdminOrLibrarian } = useAuth();
+  const { isAdminOrLibrarian, toggleFavorite, isFavorite, addToCart, cart } = useAuth();
   
   if (loading) {
     return (
@@ -21,7 +22,7 @@ function BookTable({ books, loading, onDelete, onBorrow }) {
   }
 
   const buttonStyle = (bgColor, textColor) => ({
-    padding: '8px 16px',
+    padding: '8px 14px',
     borderRadius: '6px',
     border: 'none',
     backgroundColor: bgColor,
@@ -54,98 +55,113 @@ function BookTable({ books, loading, onDelete, onBorrow }) {
         </tr>
       </thead>
       <tbody>
-        {books.map((book) => (
-          <tr
-            key={book.bookId}
-            style={{
-              borderBottom: '1px solid #e8eaed',
-              transition: 'background-color 0.15s ease',
-            }}
-            onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = '#f9fafb')}
-            onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = 'transparent')}
-          >
-            <td style={{ padding: '14px 16px', fontSize: '14px', color: '#1f2937', fontWeight: '500' }}>
-              {book.title}
-            </td>
-            <td style={{ padding: '14px 16px', fontSize: '13px', color: '#6c757d' }}>
-              {book.author}
-            </td>
-            <td style={{ padding: '14px 16px', fontSize: '13px', color: '#6c757d' }}>
-              {book.isbn || '-'}
-            </td>
-            <td style={{ padding: '14px 16px', fontSize: '13px', color: '#6c757d' }}>
-              {book.categoryName || '-'}
-            </td>
-            <td style={{ padding: '14px 16px', textAlign: 'center' }}>
-              <div style={{ display: 'flex', gap: '8px', justifyContent: 'center', alignItems: 'center', flexWrap: 'wrap' }}>
-                {/* Edit Button - Admin/Librarian only */}
-                {isAdminOrLibrarian() && (
-                  <Link
-                    to={`/books/edit/${book.bookId}`}
-                    style={{
-                      ...buttonStyle('#003F7F', '#fff'),
-                      textDecoration: 'none',
-                      display: 'inline-block',
-                    }}
-                    title="Edit this book"
-                    onMouseEnter={(e) => {
-                      e.currentTarget.style.backgroundColor = '#002d5c';
-                      e.currentTarget.style.boxShadow = '0 2px 8px rgba(0, 63, 127, 0.3)';
-                      e.currentTarget.style.transform = 'translateY(-1px)';
-                    }}
-                    onMouseLeave={(e) => {
-                      e.currentTarget.style.backgroundColor = '#003F7F';
-                      e.currentTarget.style.boxShadow = 'none';
-                      e.currentTarget.style.transform = 'translateY(0)';
-                    }}
-                  >
-                    Edit
-                  </Link>
-                )}
+        {books.map((book) => {
+          const favorited = isFavorite(book.bookId);
+          const inCart = cart.some(item => item.bookId === book.bookId);
 
-                {/* Borrow Button - All users */}
-                <button
-                  onClick={() => onBorrow(book)}
-                  style={buttonStyle('#1976d2', '#fff')}
-                  title="Borrow this book"
-                  onMouseEnter={(e) => {
-                    e.currentTarget.style.backgroundColor = '#1565c0';
-                    e.currentTarget.style.boxShadow = '0 2px 8px rgba(25, 118, 210, 0.3)';
-                    e.currentTarget.style.transform = 'translateY(-1px)';
-                  }}
-                  onMouseLeave={(e) => {
-                    e.currentTarget.style.backgroundColor = '#1976d2';
-                    e.currentTarget.style.boxShadow = 'none';
-                    e.currentTarget.style.transform = 'translateY(0)';
-                  }}
-                >
-                  Borrow
-                </button>
-
-                {/* Delete Button - Admin/Librarian only */}
-                {isAdminOrLibrarian() && (
+          return (
+            <tr
+              key={book.bookId}
+              style={{
+                borderBottom: '1px solid #e8eaed',
+                transition: 'background-color 0.15s ease',
+              }}
+              onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = '#f9fafb')}
+              onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = 'transparent')}
+            >
+              <td style={{ padding: '14px 16px', fontSize: '14px', color: '#1f2937', fontWeight: '500' }}>
+                {book.title}
+              </td>
+              <td style={{ padding: '14px 16px', fontSize: '13px', color: '#6c757d' }}>
+                {book.author}
+              </td>
+              <td style={{ padding: '14px 16px', fontSize: '13px', color: '#6c757d' }}>
+                {book.isbn || '-'}
+              </td>
+              <td style={{ padding: '14px 16px', fontSize: '13px', color: '#6c757d' }}>
+                {book.categoryName || '-'}
+              </td>
+              <td style={{ padding: '14px 16px', textAlign: 'center' }}>
+                <div style={{ display: 'flex', gap: '8px', justifyContent: 'center', alignItems: 'center', flexWrap: 'wrap' }}>
+                  
+                  {/* Thick Lucide Heart Action Button */}
                   <button
-                    onClick={() => onDelete(book.bookId)}
-                    style={buttonStyle('#d32f2f', '#fff')}
-                    title="Delete this book"
-                    onMouseEnter={(e) => {
-                      e.currentTarget.style.backgroundColor = '#b71c1c';
-                      e.currentTarget.style.boxShadow = '0 2px 8px rgba(211, 47, 47, 0.3)';
-                      e.currentTarget.style.transform = 'translateY(-1px)';
+                    onClick={() => toggleFavorite(book)}
+                    style={{
+                      background: 'none',
+                      border: 'none',
+                      cursor: 'pointer',
+                      padding: '4px 8px',
+                      transition: 'transform 0.1s ease',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center'
                     }}
-                    onMouseLeave={(e) => {
-                      e.currentTarget.style.backgroundColor = '#d32f2f';
-                      e.currentTarget.style.boxShadow = 'none';
-                      e.currentTarget.style.transform = 'translateY(0)';
-                    }}
+                    title={favorited ? "Remove from Favorites" : "Add to Favorites"}
+                    onMouseEnter={(e) => e.currentTarget.style.transform = 'scale(1.15)'}
+                    onMouseLeave={(e) => e.currentTarget.style.transform = 'scale(1)'}
                   >
-                    Delete
+                    <Heart 
+                      size={20} 
+                      strokeWidth={2.5}
+                      color={favorited ? '#ef4444' : '#9ca3af'}
+                      fill={favorited ? '#ef4444' : 'none'} 
+                    />
                   </button>
-                )}
-              </div>
-            </td>
-          </tr>
-        ))}
+
+                  {/* Edit Button - Changed color to #1976d2 */}
+                  {isAdminOrLibrarian() && (
+                    <Link
+                      to={`/books/edit/${book.bookId}`}
+                      style={{
+                        ...buttonStyle('#1976d2', '#fff'),
+                        textDecoration: 'none',
+                        display: 'inline-block',
+                      }}
+                      title="Edit this book"
+                    >
+                      Edit
+                    </Link>
+                  )}
+
+                  {/* Reserve / Add to Cart Button */}
+                  <button
+                    onClick={() => {
+                      if (!inCart) {
+                        addToCart(book);
+                      }
+                    }}
+                    disabled={inCart}
+                    style={buttonStyle(inCart ? '#cbd5e1' : '#10b981', '#fff')}
+                    title={inCart ? "Already in cart" : "Reserve this book"}
+                  >
+                    {inCart ? 'In Cart ✓' : 'Reserve'}
+                  </button>
+
+                  {/* Direct Borrow Button - Changed color to #003F7F */}
+                  <button
+                    onClick={() => onBorrow(book)}
+                    style={buttonStyle('#003F7F', '#fff')}
+                    title="Instant borrow"
+                  >
+                    Borrow
+                  </button>
+
+                  {/* Delete Button */}
+                  {isAdminOrLibrarian() && (
+                    <button
+                      onClick={() => onDelete(book.bookId)}
+                      style={buttonStyle('#d32f2f', '#fff')}
+                      title="Delete this book"
+                    >
+                      Delete
+                    </button>
+                  )}
+                </div>
+              </td>
+            </tr>
+          );
+        })}
       </tbody>
     </table>
   );

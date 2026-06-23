@@ -552,9 +552,9 @@ export default function Dashboard() {
                       {u.email}
                     </div>
                     <div style={{ display: 'flex', gap: '6px', flexWrap: 'wrap' }}>
-                      <span style={PILL('#10b981')}>✔ {u.returnedBooks}</span>
+                      <span style={PILL('#10b981')}> {u.returnedBooks}</span>
                       {u.unpaidFines > 0 && (
-                        <span style={PILL('#ef4444')}>💰 {formatCurrency(u.unpaidFines)}</span>
+                        <span style={PILL('#ef4444')}> {formatCurrency(u.unpaidFines)}</span>
                       )}
                     </div>
                   </div>

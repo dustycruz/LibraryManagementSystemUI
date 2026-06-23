@@ -83,7 +83,7 @@ export default function BorrowTable({ borrows, onReturn, loading }) {
                 {b.fineAmount > 0 ? (
                   <span style={{ fontSize: 13, fontWeight: 600, color: b.fineIsPaid ? 'var(--success)' : 'var(--danger)' }}>
                     {formatCurrency(b.fineAmount)}
-                    <span style={{ fontSize: 11, marginLeft: 4 }}>{b.fineIsPaid ? '✓' : '✗'}</span>
+                    <span style={{ fontSize: 11, marginLeft: 4 }}>{b.fineIsPaid ? '' : ''}</span>
                   </span>
                 ) : (
                   <span style={{ color: 'var(--outline)', fontSize: 13 }}>—</span>

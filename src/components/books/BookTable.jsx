@@ -135,7 +135,7 @@ function BookTable({ books, loading, onDelete, onBorrow }) {
                     style={buttonStyle(inCart ? '#cbd5e1' : '#10b981', '#fff')}
                     title={inCart ? "Already in cart" : "Reserve this book"}
                   >
-                    {inCart ? 'In Cart ✓' : 'Reserve'}
+                    {inCart ? 'In Cart ' : 'Reserve'}
                   </button>
 
                   {/* Direct Borrow Button - Changed color to #003F7F */}

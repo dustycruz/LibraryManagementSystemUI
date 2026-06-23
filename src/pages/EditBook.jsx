@@ -295,7 +295,7 @@ export default function EditBook() {
               onMouseEnter={(e) => !saving && (e.target.style.backgroundColor = '#0052a3')}
               onMouseLeave={(e) => !saving && (e.target.style.backgroundColor = '#003f7f')}
             >
-              {saving ? '🔄 Saving...' : '✓ Save Changes'}
+              {saving ? '🔄 Saving...' : ' Save Changes'}
             </button>
             <button
               type="button"

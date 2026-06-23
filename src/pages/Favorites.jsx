@@ -94,7 +94,7 @@ export default function Favorites() {
                           disabled={inCart}
                           style={buttonStyle(inCart ? '#cbd5e1' : '#10b981', '#fff')}
                         >
-                          {inCart ? 'In Cart ✓' : 'Reserve'}
+                          {inCart ? 'In Cart ' : 'Reserve'}
                         </button>
                         <button
                           onClick={() => handleRemoveFavorite(book)}
